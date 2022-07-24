@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
-message(STATUS "GitHub repository: https://gitlab.com/byco/dlhttp")
+message(STATUS "dlhttp GitHub repository: https://github.com/lionkor/dlhttp")
 
 project(dlhttp
-    HOMEPAGE_URL https://gitlab.com/byco/dlhttp
+    HOMEPAGE_URL https://github.com/lionkor/dlhttp
     VERSION 1.0.0
     LANGUAGES CXX)
 
@@ -63,6 +63,7 @@ set(dlhttp_Sources
 
 set(dlhttp_PublicIncludes
     "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/deps/ThreadPool"
 )
 
 set(dlhttp_PrivateIncludes

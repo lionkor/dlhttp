@@ -24,20 +24,36 @@
 #endif
 
 #ifndef _WIN32
-    using SOCKET = int;
-    static constexpr SOCKET INVALID_SOCKET = -1;
-    static constexpr ssize_t SOCKET_ERROR = -1;
+    #define SOCKET int
+    #define INVALID_SOCKET (-1)
+    #define SOCKET_ERROR (-1)
 #endif
 // clang-format on
 
+#include <algorithm>
 #include <functional>
+#include <memory>
 #include <string>
 #include <thread>
 #include <unordered_map>
 #include <variant>
 #include <vector>
 
+#include <ThreadPool.h>
+
+class ThreadPool;
+
 namespace dlhttp {
+
+namespace parse {
+
+    /**
+     * @brief Splits an input span by single- or multi-element delimiters,
+     * and returns a new span with the resulting splits. Empty splits are
+     * not removed. Delimiters are not included in the result.
+     */
+    std::vector<std::string> split(const std::string& input, const std::string& delim);
+}
 
 /**
  * @brief The Response class represents a generic response of any kind.
@@ -53,14 +69,20 @@ struct Response {
 using Handler = std::function<Response()>;
 using EndpointHandlerMap = std::unordered_map<std::string, Handler>;
 
+inline const std::string HTTP_VER = "HTTP/1.0";
+inline const std::string HTTP_501 = HTTP_VER + " 501 Not Implemented\r\n";
+inline const std::string HTTP_404 = HTTP_VER + " 404 Not Found\r\n";
+inline const std::string HTTP_400 = HTTP_VER + " 400 Bad Request\r\n";
+inline const std::string HTTP_200 = HTTP_VER + " 200 Ok\r\n";
+
 class AsyncContext final {
 public:
-    AsyncContext();
-private:
-    void thread_main();
-    std::thread m_thread;
+    AsyncContext(size_t pool_size);
+
+    std::unique_ptr<ThreadPool> pool;
 };
 
 bool is_http(SOCKET);
+void handle_http(SOCKET, AsyncContext&, const EndpointHandlerMap&);
 
 }
