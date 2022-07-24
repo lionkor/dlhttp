@@ -7,7 +7,7 @@
 
 namespace dlhttp::detail {
 
-static int close_socket(SOCKET sock) {
+int close_socket(SOCKET sock) {
     int status = 0;
 
 #ifdef _WIN32
@@ -24,23 +24,14 @@ static int close_socket(SOCKET sock) {
     return status;
 }
 
-static int init_sockets() {
-#ifdef _WIN32
-    WSADATA wsa_data;
-    return WSAStartup(MAKEWORD(1, 1), &wsa_data);
-#else
-    return 0;
-#endif
 }
 
-static int deinit_sockets() {
-#ifdef _WIN32
-    return WSACleanup();
-#else
-    return 0;
-#endif
+dlhttp::AsyncContext::AsyncContext()
+    : m_thread { &dlhttp::AsyncContext::thread_main, this } {
 }
 
+void dlhttp::AsyncContext::thread_main() {
+    
 }
 
 bool dlhttp::is_http(SOCKET sock) {
