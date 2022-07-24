@@ -1,1 +1,4 @@
-add_subdirectory("doctest")
+if (NOT TARGET doctest)
+    add_subdirectory("doctest")
+endif()
+
