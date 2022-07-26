@@ -61,8 +61,11 @@ namespace parse {
  * this only supports string and arbitrary byte buffers.
  */
 struct Response {
-    uint16_t status { 200 };
     std::variant<std::string, std::vector<uint8_t>> body {};
+    enum class Status {
+        Ok_200,
+        NotFound_404,
+    } status { Status::Ok_200 };
     std::string content_type {};
 };
 

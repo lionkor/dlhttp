@@ -95,7 +95,14 @@ void dlhttp::handle_http(SOCKET sock, AsyncContext& ctx, const EndpointHandlerMa
     auto task = ctx.pool->enqueue([crlf, sock, splits, &ep_map](int) {
         if (ep_map.find(splits.at(1)) != ep_map.end()) {
             Response response_data = ep_map.at(splits.at(1))();
-            ::send(sock, reinterpret_cast<const char*>(HTTP_200.data()), HTTP_200.size(), 0);
+            switch (response_data.status) {
+            case dlhttp::Response::Status::NotFound_404:
+                ::send(sock, reinterpret_cast<const char*>(HTTP_404.data()), HTTP_404.size(), 0);
+            case dlhttp::Response::Status::Ok_200:
+                // fallthrough
+            default:
+                ::send(sock, reinterpret_cast<const char*>(HTTP_200.data()), HTTP_200.size(), 0);
+            }
             ::send(sock, reinterpret_cast<const char*>(crlf.data()), crlf.size(), 0);
             if (response_data.body.index() == 0) {
                 auto str = std::get<0>(response_data.body);
@@ -108,7 +115,8 @@ void dlhttp::handle_http(SOCKET sock, AsyncContext& ctx, const EndpointHandlerMa
             ::send(sock, reinterpret_cast<const char*>(HTTP_404.data()), HTTP_404.size(), 0);
         }
         detail::close_socket(sock);
-    }, 0);
+    },
+        0);
 }
 
 dlhttp::AsyncContext::AsyncContext(size_t pool_size)
