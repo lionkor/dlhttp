@@ -103,7 +103,6 @@ void dlhttp::handle_http(SOCKET sock, AsyncContext& ctx, const EndpointHandlerMa
             default:
                 ::send(sock, reinterpret_cast<const char*>(HTTP_200.data()), HTTP_200.size(), 0);
             }
-            ::send(sock, reinterpret_cast<const char*>(crlf.data()), crlf.size(), 0);
             if (response_data.body.index() == 0) {
                 auto str = std::get<0>(response_data.body);
                 ::send(sock, reinterpret_cast<const char*>(str.c_str()), str.size(), 0);
